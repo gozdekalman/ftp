@@ -1,340 +1,246 @@
 from ftplib import FTP
+import os
 import time
 from termcolor import colored
 import getpass
-import os
 
-ftp = FTP('')
+ftp = FTP()
 
-
-def main():
-
-    uzak = Uzak()
+def clear_screen():
     os.system("clear")
-    print(colored("BM402_FTP Gözde Kalman 191180046", "yellow"))
-    print(colored("FTP Client", "yellow"))
-    print(colored("Sunucuya Bağlan", "yellow"))
-    uzak.connect()
-    print(colored("Sunucuya Giriş Yap", "blue"))
-    uzak.login()
-    common = Common()
-    yerel = Yerel()
-    os.system("clear")
-    donguBilgi()
-    while True:
-        secim1 = input("Seçim: ")
-        if secim1 == "1":
-            os.system("clear")
-            yerelBilgi()
-        elif secim1 == "2":
-            os.system("clear")
-            uzakBilgi()
-        elif secim1 == "3":
-            yerel.dosyaListeleme()
-            uzak.dosyaListeleme()
-            common.dosyaYukle()
-        elif secim1 == "4":
-            yerel.dosyaListeleme()
-            uzak.dosyaListeleme()
-            common.dosyaIndir()
-        elif secim1 == "5":
-            print(colored("Çıkış Yapılıyor", "blue"))
-            time.sleep(1)
-            os.system("clear")
-            break
-        else:
-            print(colored("Hatalı Seçim", "red"))
-            time.sleep(1)
-            os.system("clear")
-            donguBilgi()
-            continue
-        while secim1 == "1":
-            secim2 = input("Seçim: ")
-            if secim2 == "1":
-                yerel.dizinOlusturma()
-            elif secim2 == "2":
-                yerel.dizinSilme()
-            elif secim2 == "3":
-                yerel.dosyaAdıDegistirme()
-            elif secim2 == "4":
-                yerel.dosyaSilme()
-            elif secim2 == "5":
-                yerel.dizinDegistirmek()
-            elif secim2 == "6":
-                yerel.dosyaListeleme()
-            elif secim2 == "7":
-                os.system("clear")
-                donguBilgi()
-                break
-            else:
-                print(colored("Hatalı Seçim", "red"))
-                time.sleep(1)
-                os.system("clear")
-                donguBilgi()
-                break
-        while secim1 == "2":
-            secim2 = input("Seçim: ")
-            if secim2 == "1":
-                uzak.dizinOlusturma()
-            elif secim2 == "2":
-                uzak.dizinSilme()
-            elif secim2 == "3":
-                uzak.dosyaAdıDegistirme()
-            elif secim2 == "4":
-                uzak.dosyaSilme()
-            elif secim2 == "5":
-                uzak.dizinDegistirmek()
-            elif secim2 == "6":
-                uzak.dosyaListeleme()
-            elif secim2 == "7":
-                os.system("clear")
-                donguBilgi()
-                break
-            else:
-                print(colored("Hatalı Seçim", "red"))
-                time.sleep(1)
-                os.system("clear")
-                donguBilgi()
-                break
 
+def print_colored(message, color):
+    print(colored(message, color))
 
-class Common:
-    def dosyaYukle(self):
-        try:
-            dosyaadi = input("Yüklenecek Dosya Adı: ")
-            ftp.storbinary('STOR '+dosyaadi, open(dosyaadi, 'rb'))
-            print(colored("Dosya Yüklendi", "green"))
-            time.sleep(5)
-        except:
-            print(colored("Dosya Yüklenemedi", "red"))
-            time.sleep(1)
-        finally:
-            os.system("clear")
-            donguBilgi()
+def pause(message, color, duration=1):
+    print_colored(message, color)
+    time.sleep(duration)
+    clear_screen()
 
-    def dosyaIndir(self):
-        try:
-            dosyaadi = input("İndirilecek Dosya Adı: ")
-            dosya = open(dosyaadi, 'wb')
-            ftp.retrbinary('RETR ' + dosyaadi, dosya.write, 1014)
-            print(colored("Dosya İndirildi", "green"))
-            time.sleep(5)
-        except:
-            print(colored("Dosya İndirilemedi", "red"))
-            time.sleep(1)
-        finally:
-            os.system("clear")
-            donguBilgi()
+class FTPClient:
+    def __init__(self):
+        self.ftp = FTP()
+        self.run()
 
+    def run(self):
+        clear_screen()
+        print_colored("BM402_FTP Gözde Kalman 191180046", "yellow")
+        print_colored("FTP Client", "yellow")
+        self.connect()
+        self.main_menu()
 
-# yerel
-
-class Yerel:
-    def dizinOlusturma(self):
-        try:
-            dizinadi = input("Dizin Adı: ")
-            os.mkdir(dizinadi)
-            print(colored("Dizin Oluşturuldu", "green"))
-            time.sleep(5)
-        except:
-            print(colored("Dizin Oluşturulamadı", "red"))
-            time.sleep(1)
-        finally:
-            os.system("clear")
-            yerelBilgi()
-
-    def dizinSilme(self):
-        try:
-            dizinadi = input("Dizin Adı: ")
-            os.rmdir(dizinadi)
-            print(colored("Dizin Silindi", "green"))
-            time.sleep(5)
-        except:
-            print(colored("Dizin Silinemedi", "red"))
-            time.sleep(1)
-        finally:
-            os.system("clear")
-            yerelBilgi()
-
-    def dosyaAdıDegistirme(self):
-        try:
-            eskiDosyaAdi = input("Eski Dosya Adı: ")
-            yeniDosyaAdi = input("Yeni Dosya Adı: ")
-            os.rename(eskiDosyaAdi, yeniDosyaAdi)
-            print(colored("Dosya Adı Değiştirildi", "green"))
-            time.sleep(5)
-        except:
-            print(colored("Dosya Adı Değiştirilemedi", "red"))
-            time.sleep(1)
-        finally:
-            os.system("clear")
-            yerelBilgi()
-
-    def dosyaSilme(self):
-        try:
-            dosyaadi = input("Dosya Adı: ")
-            os.remove(dosyaadi)
-            print(colored("Dosya Silindi", "green"))
-            time.sleep(5)
-        except:
-            print(colored("Dosya Silinemedi", "red"))
-            time.sleep(1)
-        finally:
-            os.system("clear")
-            yerelBilgi()
-
-    def dizinDegistirmek(self):
-        try:
-            dizin = input("Dizin Adı(Geri Dönmek için .. yazınız): ")
-            os.chdir(dizin)
-            print(colored("Dizin Değiştirildi", "green"))
-            time.sleep(5)
-        except:
-            print(colored("Dizin Değiştirilemedi", "red"))
-            time.sleep(1)
-        finally:
-            os.system("clear")
-            yerelBilgi()
-
-    def dosyaListeleme(self):
-        try:
-            print(colored("Yerel Dizin:", "blue"))
-            os.system("ls")
-        except:
-            print(colored("Dosya Listelenemedi", "red"))
-            time.sleep(1)
-
-# uzak
-
-
-class Uzak:
     def connect(self):
-        try:
-            url = input("Sunucu Adresi: ")
-            port = input("Sunucu Portu(Varsayılan 21): ")
-            ftp.connect(url, int(port))
-            print(colored("Bağlantı Başarılı", "green"))
-        except:
-            print(colored("Bağlantı Başarısız...\nTekrar Deneyin", "red"))
-            time.sleep(1)
-            self.connect()
+        while True:
+            server_address = input("Sunucu Adresi: ")
+            server_port = input("Sunucu Portu (Varsayılan 21): ") or '21'
+            try:
+                self.ftp.connect(server_address, int(server_port))
+                print_colored("Bağlantı Başarılı", "green")
+                break
+            except Exception as e:
+                print_colored("Bağlantı Başarısız: " + str(e), "red")
+                time.sleep(1)
+
+        self.login()
 
     def login(self):
-        try:
-            name = input("Kullanıcı Adı: ")
+        while True:
+            username = input("Kullanıcı Adı: ")
             password = getpass.getpass("Şifre: ")
-            ftp.login(name, password)
-            print("Giriş Başarılı")
-            time.sleep(1)
-        except:
-            print(colored("Giriş Başarısız...\nTekrar Deneyin", "red"))
-            time.sleep(1)
-            self.login()
+            try:
+                self.ftp.login(username, password)
+                print_colored("Giriş Başarılı", "green")
+                break
+            except Exception as e:
+                print_colored("Giriş Başarısız: " + str(e), "red")
 
-    def dizinOlusturma(self):
+    def main_menu(self):
+        options = {
+            "1": ("Yerel İşlemler", self.local_operations),
+            "2": ("Uzak Sunucu İşlemler", self.remote_operations),
+            "3": ("Dosya Yükle", self.upload_file),
+            "4": ("Dosya İndir", self.download_file),
+            "5": ("Çıkış Yap", self.exit_client)
+        }
+
+        while True:
+            clear_screen()
+            for key, (desc, _) in options.items():
+                print_colored(f"{key}) {desc}", "blue")
+            
+            choice = input("Seçim: ")
+            action = options.get(choice)
+            if action:
+                _, action_method = action
+                action_method()
+            else:
+                pause("Hatalı Seçim", "red")
+
+    def local_operations(self):
+        operations = {
+            "1": ("Dizin Oluştur", self.create_local_directory),
+            "2": ("Dizin Sil", self.remove_local_directory),
+            "3": ("Dosya Adı Değiştir", self.rename_local_file),
+            "4": ("Dosya Sil", self.delete_local_file),
+            "5": ("Dizin Değiştir", self.change_local_directory),
+            "6": ("Dosya Listele", self.list_local_files),
+            "7": ("Ana Menüye Dön", None)
+        }
+
+        self.run_operations("Yerel İşlemler", operations)
+
+    def remote_operations(self):
+        operations = {
+            "1": ("Dizin Oluştur", self.create_remote_directory),
+            "2": ("Dizin Sil", self.remove_remote_directory),
+            "3": ("Dosya Adı Değiştir", self.rename_remote_file),
+            "4": ("Dosya Sil", self.delete_remote_file),
+            "5": ("Dizin Değiştir", self.change_remote_directory),
+            "6": ("Dosya Listele", self.list_remote_files),
+            "7": ("Ana Menüye Dön", None)
+        }
+
+        self.run_operations("Uzak Sunucu İşlemler", operations)
+
+    def run_operations(self, menu_name, operations):
+        while True:
+            clear_screen()
+            print_colored(menu_name, "blue")
+            for key, (desc, _) in operations.items():
+                print_colored(f"{key}) {desc}", "blue")
+
+            choice = input("Seçim: ")
+            if choice == "7":
+                break
+            action = operations.get(choice)
+            if action:
+                _, action_method = action
+                if action_method:
+                    action_method()
+            else:
+                pause("Hatalı Seçim", "red")
+
+    def create_local_directory(self):
+        directory_name = input("Dizin Adı: ")
         try:
-            dizinadi = input("Dizin Adı: ")
-            ftp.mkd(dizinadi)
-            print(colored("Dizin Oluşturuldu", "green"))
-            time.sleep(1)
-        except:
-            print(colored("Dizin Oluşturulamadı", "red"))
-            time.sleep(1)
-        finally:
-            os.system("clear")
-            uzakBilgi()
+            os.mkdir(directory_name)
+            pause("Dizin Oluşturuldu", "green", 2)
+        except Exception as e:
+            pause(f"Dizin Oluşturulamadı: {str(e)}", "red")
 
-    def dizinSilme(self):
+    def remove_local_directory(self):
+        directory_name = input("Dizin Adı: ")
         try:
-            dizinadi = input("Dizin Adı: ")
-            ftp.rmd(dizinadi)
-            print(colored("Dizin Silindi", "green"))
-            time.sleep(1)
-        except:
-            print(colored("Dizin Silinemedi", "red"))
-            time.sleep(1)
-        finally:
-            os.system("clear")
-            uzakBilgi()
+            os.rmdir(directory_name)
+            pause("Dizin Silindi", "green", 2)
+        except Exception as e:
+            pause(f"Dizin Silinemedi: {str(e)}", "red")
 
-    def dosyaAdıDegistirme(self):
+    def rename_local_file(self):
+        old_name = input("Eski Dosya Adı: ")
+        new_name = input("Yeni Dosya Adı: ")
         try:
-            eskiDosyaAdi = input("Eski Dosya Adı: ")
-            yeniDosyaAdi = input("Yeni Dosya Adı: ")
-            ftp.rename(eskiDosyaAdi, yeniDosyaAdi)
-            print(colored("Dosya Adı Değiştirildi", "green"))
-            time.sleep(1)
-        except:
-            print(colored("Dosya Adı Değiştirilemedi", "red"))
-            time.sleep(1)
-        finally:
-            os.system("clear")
-            uzakBilgi()
+            os.rename(old_name, new_name)
+            pause("Dosya Adı Değiştirildi", "green", 2)
+        except Exception as e:
+            pause(f"Dosya Adı Değiştirilemedi: {str(e)}", "red")
 
-    def dosyaSilme(self):
+    def delete_local_file(self):
+        file_name = input("Dosya Adı: ")
         try:
-            dosyaadi = input("Dosya Adı: ")
-            ftp.delete(dosyaadi)
-            print(colored("Dosya Silindi", "green"))
-            time.sleep(1)
-        except:
-            print(colored("Dosya Silinemedi", "red"))
-            time.sleep(1)
-        finally:
-            os.system("clear")
-            uzakBilgi()
+            os.remove(file_name)
+            pause("Dosya Silindi", "green", 2)
+        except Exception as e:
+            pause(f"Dosya Silinemedi: {str(e)}", "red")
 
-    def dosyaListeleme(self):
+    def change_local_directory(self):
+        directory_name = input("Dizin Adı (Geri Dönmek için .. yazınız): ")
         try:
-            print(colored("Uzak Dizin:", "blue"))
-            ftp.dir()
-        except:
-            print(colored("Dosya Listelenemedi", "red"))
-            time.sleep(1)
+            os.chdir(directory_name)
+            pause("Dizin Değiştirildi", "green", 2)
+        except Exception as e:
+            pause(f"Dizin Değiştirilemedi: {str(e)}", "red")
 
-    def dizinDegistirmek(self):
+    def list_local_files(self):
         try:
-            dizin = input("Dizin Adı: ")
-            ftp.cwd(dizin)
-            print(colored("Dizin Değiştirildi", "green"))
-            time.sleep(1)
-        except:
-            print(colored("Dizin Değiştirilemedi", "red"))
-            time.sleep(1)
-        finally:
-            os.system("clear")
-            uzakBilgi()
+            print_colored("Yerel Dizin:", "blue")
+            os.system("ls")
+        except Exception as e:
+            pause(f"Dosya Listelenemedi: {str(e)}", "red")
+
+    def upload_file(self):
+        file_name = input("Yüklenecek Dosya Adı: ")
+        try:
+            with open(file_name, 'rb') as file:
+                self.ftp.storbinary(f'STOR {file_name}', file)
+            pause("Dosya Yüklendi", "green", 2)
+        except Exception as e:
+            pause(f"Dosya Yüklenemedi: {str(e)}", "red")
+
+    def download_file(self):
+        file_name = input("İndirilecek Dosya Adı: ")
+        try:
+            with open(file_name, 'wb') as file:
+                self.ftp.retrbinary(f'RETR {file_name}', file.write)
+            pause("Dosya İndirildi", "green", 2)
+        except Exception as e:
+            pause(f"Dosya İndirilemedi: {str(e)}", "red")
+
+    def exit_client(self):
+        self.ftp.quit()
+        print_colored("Çıkış Yapılıyor", "blue")
+        time.sleep(1)
+        clear_screen()
+        exit()
+
+    def create_remote_directory(self):
+        directory_name = input("Dizin Adı: ")
+        try:
+            self.ftp.mkd(directory_name)
+            pause("Dizin Oluşturuldu", "green")
+        except Exception as e:
+            pause(f"Dizin Oluşturulamadı: {str(e)}", "red")
+
+    def remove_remote_directory(self):
+        directory_name = input("Dizin Adı: ")
+        try:
+            self.ftp.rmd(directory_name)
+            pause("Dizin Silindi", "green")
+        except Exception as e:
+            pause(f"Dizin Silinemedi: {str(e)}", "red")
+
+    def rename_remote_file(self):
+        old_name = input("Eski Dosya Adı: ")
+        new_name = input("Yeni Dosya Adı: ")
+        try:
+            self.ftp.rename(old_name, new_name)
+            pause("Dosya Adı Değiştirildi", "green")
+        except Exception as e:
+            pause(f"Dosya Adı Değiştirilemedi: {str(e)}", "red")
+
+    def delete_remote_file(self):
+        file_name = input("Dosya Adı: ")
+        try:
+            self.ftp.delete(file_name)
+            pause("Dosya Silindi", "green")
+        except Exception as e:
+            pause(f"Dosya Silinemedi: {str(e)}", "red")
+
+    def list_remote_files(self):
+        try:
+            print_colored("Uzak Dizin:", "blue")
+            self.ftp.dir()
+        except Exception as e:
+            pause(f"Dosya Listelenemedi: {str(e)}", "red")
+
+    def change_remote_directory(self):
+        directory_name = input("Dizin Adı: ")
+        try:
+            self.ftp.cwd(directory_name)
+            pause("Dizin Değiştirildi", "green")
+        except Exception as e:
+            pause(f"Dizin Değiştirilemedi: {str(e)}", "red")
 
 
-def donguBilgi():
-    print(colored("FTP Client", "blue"))
-    print(colored("1) Yerel İşlemler", "blue"))
-    print(colored("2) Uzak Sunucu İşlemler", "blue"))
-    print(colored("3) Dosya Yükle", "blue"))
-    print(colored("4) Dosya İndir", "blue"))
-    print(colored("5) Çıkış Yap", "red"))
-
-
-def yerelBilgi():
-    print(colored("Yerel İşlemler", "blue"))
-    print(colored("1) Dizin Oluştur", "blue"))
-    print(colored("2) Dizin Sil", "blue"))
-    print(colored("3) Dosya Adı Değiştir", "blue"))
-    print(colored("4) Dosya Sil", "blue"))
-    print(colored("5) Dizin Değiştir", "blue"))
-    print(colored("6) Dosya Listele", "blue"))
-    print(colored("7) Ana Menüye Dön", "blue"))
-
-
-def uzakBilgi():
-    print(colored("Uzak Sunucu İşlemler", "blue"))
-    print(colored("1) Dizin Oluştur", "blue"))
-    print(colored("2) Dizin Sil", "blue"))
-    print(colored("3) Dosya Adı Değiştir", "blue"))
-    print(colored("4) Dosya Sil", "blue"))
-    print(colored("5) Dizin Değiştir", "blue"))
-    print(colored("6) Dosya Listele", "blue"))
-    print(colored("7) Ana Menüye Dön", "blue"))
-
-
-main()
+if __name__ == "__main__":
+    FTPClient()
